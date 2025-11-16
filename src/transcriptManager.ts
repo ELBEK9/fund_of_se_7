@@ -26,7 +26,7 @@ export function getAll(): Transcript[] {
   return allTranscripts;
 }
 
-// manages the student IDs (class follows the singleton pattern)
+// manages the student IDs (singleton)
 class StudentIDManager {
   private static lastUsedID = 0;
 
@@ -47,7 +47,7 @@ export function addStudent(name: string, grades: CourseGrade[] = []): StudentID 
   return newID;
 }
 
-// gets transcript for given ID.  Returns undefined if missing
+// gets transcript for given ID. Returns undefined if missing
 export function getTranscript(studentID: number): Transcript {
   return allTranscripts.find(transcript => transcript.student.studentID == studentID);
 }
@@ -60,7 +60,6 @@ export function getStudentIDs(studentName: string): StudentID[] {
 }
 
 // deletes student with the given ID from the database.
-// throws exception if no such student.  (Is this the best idea?)
 export function deleteStudent(studentID: StudentID): void {
   const index = allTranscripts.findIndex(t => t.student.studentID == studentID);
   if (index == -1) {
@@ -77,13 +76,12 @@ export function addGrade(studentID: StudentID, course: Course, grade: number): v
   const theTranscript = allTranscripts[tIndex];
   try {
     allTranscripts[tIndex] = addGradeToTranscript(theTranscript, course, grade);
-  } catch (e) {
+  } catch {
     throw new Error(`student ${studentID} already has a grade in course ${course}`);
   }
 }
 
 // returns transcript like the original, but with the new grade added.
-// throws an error if the course is already on the transcript
 function addGradeToTranscript(
   theTranscript: Transcript,
   course: Course,
@@ -97,7 +95,6 @@ function addGradeToTranscript(
 }
 
 // returns the grade for the given student in the given course.
-// throws an error if no such student or no such course for that student
 export function getGrade(studentID: StudentID, course: Course): number {
   const theTranscript = allTranscripts.find(t => t.student.studentID == studentID);
   const theGrade = theTranscript.grades.find(g => g.course == course);
